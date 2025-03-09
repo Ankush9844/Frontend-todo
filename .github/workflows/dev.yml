@@ -2,10 +2,10 @@ name: toDoApp-dev
 on: 
   push:
     branches:
-    - dev
+    - stage
   pull_request:
     branches:
-    - dev
+    - stage
 
 permissions:
   contents: read
@@ -70,7 +70,7 @@ jobs:
       - name: changing the github repo
         uses: actions/checkout@v4.2.2
         with:
-          ref: dev
+          ref: stage
           repository: Ankush9844/todo-k8s-deployment
           token: ${{ secrets.GIT_TOKEN}}
       - name: change Docker tag
@@ -91,5 +91,5 @@ jobs:
           fi
 
           git commit -m "docker image change to ankush9844/todo:backend-${{ github.run_number }}"
-          git push -f origin dev
+          git push -f origin stage
 
