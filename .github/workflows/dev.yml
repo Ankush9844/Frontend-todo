@@ -1,4 +1,4 @@
-name: toDoApp-dev
+name: toDoApp-stage
 on: 
   push:
     branches:
@@ -15,31 +15,19 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [ "3.10" ]
-
+        node-version: ['20.x']
     steps:
       - name: git checkout
         uses: actions/checkout@v4.2.2
       
-      - name: Python setup ${{ matrix.python-version }}
-        uses: actions/setup-python@v5
+      - name: Nodejs setup
+        uses: actions/setup-node@v4.2.0
         with:
-          python-version: ${{ matrix.python-version }}
-    
-      - name: Install Dependencies [ python code testing, requirements ]
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install flake8 pytest
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-      
-      
-      - name: Lint with flake8(for python code test)
-        run: |
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-      
+          npm i
 
   docker:
     needs: build
@@ -61,7 +49,7 @@ jobs:
         with: 
           file: ./Dockerfile
           push: true
-          tags: ankush9844/todo:backend-${{ github.run_number }}
+          tags: ankush9844/todo:frontend-${{ github.run_number }}
 
   modify-git:
     needs: [build, docker]
@@ -78,10 +66,10 @@ jobs:
           git config --global user.name "Ankush9844"
           git config --global user.email "ankush.katkurwar30@gmail.com"
           pwd
-          cd app/backend/
+          cd stage/app/frontend/
           pwd
-          sed -i "s|ankush9844/todo:backend.*|ankush9844/todo:backend-${{ github.run_number }}|" backend.yml
-          cat backend.yml
+          sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" frontend.yml
+          cat frontend.yml
           git add .
 
           # Check if there are changes before committing
@@ -90,6 +78,5 @@ jobs:
             exit 0  # Exit successfully
           fi
 
-          git commit -m "docker image change to ankush9844/todo:backend-${{ github.run_number }}"
+          git commit -m "docker image change to ankush9844/todo:frontend-${{ github.run_number }}"
           git push -f origin stage
-
