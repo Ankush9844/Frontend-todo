@@ -31,6 +31,7 @@
                     <button onclick="toggleCompletion(${todo.id}, ${todo.completed})" class="${todo.completed ? 'complete' : ''}">
                         ${todo.completed ? 'Undo' : 'Complete'}
                     </button>
+                    <button onclick="updateTodo(${todo.id}, '${todo.task}')">Update</button>
                     <button onclick="deleteTodo(${todo.id})">Delete</button>
                 </li>
             `).join('');
@@ -45,7 +46,6 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ task })
             });
-            const newTodo = await response.json();
             taskInput.value = '';
             fetchTodos();
         });
@@ -60,6 +60,19 @@
             fetchTodos();
         }
 
+        // Update a todo task
+        async function updateTodo(id, oldTask) {
+            const newTask = prompt("Update your task:", oldTask);
+            if (newTask && newTask.trim() !== "") {
+                await fetch(`/api/todos/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task: newTask })
+                });
+                fetchTodos();
+            }
+        }
+
         // Delete a todo
         async function deleteTodo(id) {
             await fetch(`/api/todos/${id}`, { method: 'DELETE' });
@@ -70,5 +83,6 @@
         fetchTodos();
     </script>
 </body>
+
 
 </html>

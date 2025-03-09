@@ -56,6 +56,16 @@ app.delete('/api/todos/:id', async (req, res) => {
     }
 });
 
+// Liveness Probe
+app.get('/health', (req, res) => {
+    res.status(200).send('OK');
+});
+
+// Readiness Probe
+app.get('/ready', (req, res) => {
+    res.status(200).send('Ready');
+});
+
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);
 });
