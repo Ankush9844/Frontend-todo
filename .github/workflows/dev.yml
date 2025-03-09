@@ -70,8 +70,8 @@ jobs:
           pwd
           cd app/frontend/
           pwd
-          sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" backend.yml
-          cat backend.yml
+          sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" frontend.yml
+          cat frontend.yml
           git add .
 
           # Check if there are changes before committing
