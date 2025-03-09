@@ -13,8 +13,9 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
-    matrix:
-      node-version: ['18.20.', '20.18']
+    strategy:
+      matrix:
+        node-version: ['18.20.', '20.18']
     steps:
       - name: git checkout
         uses: actions/checkout@v4.2.2
