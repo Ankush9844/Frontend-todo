@@ -1,0 +1,84 @@
+name: toDoApp-dev
+on: 
+  push:
+    branches:
+    - dev
+  pull_request:
+    branches:
+    - dev
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: ['20.x']
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v4.2.2
+      
+      - name: Nodejs setup
+        uses: actions/setup-node@v4.2.0
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: Install dependencies
+        run: |
+          npm i
+
+      
+
+  docker:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout of code
+        uses: actions/checkout@v4.2.2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3.6.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3.10.0
+      - name: Docker login
+        uses: docker/login-action@v3.3.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME}}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: Build and push docker image
+        uses: docker/build-push-action@v6.15.0
+        with: 
+          file: ./Dockerfile
+          push: true
+          tags: ankush9844/todo:frontend-${{ github.run_number }}
+
+  modify-git:
+    needs: [build, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: changing the github repo
+        uses: actions/checkout@v4.2.2
+        with:
+          ref: dev
+          repository: Ankush9844/todo-k8s-deployment
+          token: ${{ secrets.GIT_TOKEN}}
+      - name: change Docker tag
+        run: |
+          git config --global user.name "Ankush9844"
+          git config --global user.email "ankush.katkurwar30@gmail.com"
+          pwd
+          cd app/frontend/
+          pwd
+          sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" frontend.yml
+          cat frontend.yml
+          git add .
+
+          # Check if there are changes before committing
+          if git diff --cached --quiet; then
+            echo "No changes detected, skipping commit and push."
+            exit 0  # Exit successfully
+          fi
+
+          git commit -m "docker image change to ankush9844/todo:frontend-${{ github.run_number }}"
+          git push -f origin dev
