@@ -68,7 +68,7 @@ jobs:
           git config --global user.name "Ankush9844"
           git config --global user.email "ankush.katkurwar30@gmail.com"
           pwd
-          cd app/frontend/
+          cd app/dev/frontend/
           pwd
           sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" frontend.yml
           cat frontend.yml

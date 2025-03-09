@@ -1,11 +1,11 @@
-name: toDoApp-stage
+name: toDoApp-main
 on: 
   push:
     branches:
-    - stage
+    - main
   pull_request:
     branches:
-    - stage
+    - main
 
 permissions:
   contents: read
@@ -60,7 +60,7 @@ jobs:
       - name: changing the github repo
         uses: actions/checkout@v4.2.2
         with:
-          ref: stage
+          ref: main
           repository: Ankush9844/todo-k8s-deployment
           token: ${{ secrets.GIT_TOKEN}}
       - name: change Docker tag
@@ -68,7 +68,7 @@ jobs:
           git config --global user.name "Ankush9844"
           git config --global user.email "ankush.katkurwar30@gmail.com"
           pwd
-          cd app/stage/frontend/
+          cd app/prod/frontend/
           pwd
           sed -i "s|ankush9844/todo:frontend.*|ankush9844/todo:frontend-${{ github.run_number }}|" frontend.yml
           cat frontend.yml
@@ -81,4 +81,4 @@ jobs:
           fi
 
           git commit -m "docker image change to ankush9844/todo:frontend-${{ github.run_number }}"
-          git push -f origin stage
+          git push -f origin main
